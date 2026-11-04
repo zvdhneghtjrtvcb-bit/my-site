@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ahmed</title>
+<style>
+:root{--bg:#0b0e14;--bg2:#141a26;--card:rgba(255,255,255,.07);--bd:rgba(255,255,255,.12);--tx:#f2f4f8;--sub:#9aa4b5;--ac:#6ea8ff}
+:root.light{--bg:#eef1f6;--bg2:#ffffff;--card:rgba(255,255,255,.85);--bd:rgba(0,0,0,.08);--tx:#161a22;--sub:#5d6778;--ac:#2f6fe0}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(1200px 600px at 50% -10%,var(--bg2),var(--bg));color:var(--tx);font-family:system-ui,-apple-system,"Segoe UI",sans-serif;padding:18px 14px 40px}
+.wrap{max-width:460px;margin:0 auto}
+.top{display:flex;justify-content:space-between;gap:8px}
+.top button{background:var(--card);border:1px solid var(--bd);color:var(--tx);border-radius:999px;padding:8px 14px;font-size:14px}
+.hero{text-align:center;margin:18px 0 22px}
+.av{width:92px;height:92px;border-radius:50%;margin:0 auto 12px;display:flex;align-items:center;justify-content:center;font-size:40px;font-weight:700;color:#fff;background:linear-gradient(135deg,#6ea8ff,#a46bff);box-shadow:0 10px 30px rgba(110,168,255,.35)}
+h1{margin:0;font-size:26px}
+.bio{margin:6px 0 0;color:var(--sub);font-size:15px}
+.card{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--bd);border-radius:22px;padding:12px;margin-bottom:10px;text-decoration:none;color:var(--tx);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);opacity:0;transform:translateY(14px);animation:in .6s forwards;position:relative}
+@keyframes in{to{opacity:1;transform:none}}
+.ic{flex:none;width:48px;height:48px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:24px;overflow:hidden;color:#111}
+.ic img{width:100%;height:100%;object-fit:cover}
+.txt{flex:1;min-width:0}
+.app{font-size:11px;letter-spacing:.06em;color:var(--sub);text-transform:uppercase;display:flex;justify-content:space-between}
+.ttl{font-size:16px;font-weight:600;margin-top:2px}
+.sub{font-size:13px;color:var(--sub);margin-top:1px;direction:ltr;unicode-bidi:plaintext;text-align:start;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cp{flex:none;background:var(--ac);color:#fff;border:0;border-radius:12px;padding:9px 14px;font-size:14px}
+.foot{text-align:center;color:var(--sub);font-size:12px;margin-top:22px}
+</style></head><body>
+<div class="wrap">
+  <div class="top"><button id="lang"></button><button id="theme"></button></div>
+  <div class="hero">
+    <div class="av" id="av"></div>
+    <h1 id="nm"></h1>
+    <p class="bio" id="bio"></p>
+  </div>
+  <div id="list"></div>
+  <div class="foot" id="foot"></div>
+</div>
+<script src="config.js"></script>
+<script>
+(function(){
+var T={
+ ar:{now:'الآن',sham:'شام كاش',shamT:'كود الدفع',copy:'نسخ',copied:'تم النسخ ✓',calm:'ركن الهدوء',calmT:'لحظة راحة نفسية',foot:'أهلاً بك في موقعي',lang:'English',dark:'🌙 داكن',light:'☀️ فاتح'},
+ en:{now:'now',sham:'Sham Cash',shamT:'Payment code',copy:'Copy',copied:'Copied ✓',calm:'Calm corner',calmT:'A moment of peace',foot:'Welcome to my site',lang:'عربي',dark:'🌙 Dark',light:'☀️ Light'}
+};
+var lang='ar',light=false;
+try{lang=localStorage.getItem('lang')||'ar';light=localStorage.getItem('theme')==='light';}catch(e){}
+var cfg=window.CFG||{links:[],sham:{code:''}};
+
+function el(tag,txt,cls){var e=document.createElement(tag);if(txt!==undefined&&txt!==null)e.textContent=txt;if(cls)e.className=cls;return e;}
+function copyText(s,btn){
+  var done=function(){btn.textContent=T[lang].copied;setTimeout(function(){btn.textContent=T[lang].copy;},1600);};
+  if(navigator.clipboard&&window.isSecureContext){navigator.clipboard.writeText(s).then(done,function(){fb();});}
+  else fb();
+  function fb(){var t=document.createElement('textarea');t.value=s;t.style.position='fixed';t.style.opacity='0';document.body.appendChild(t);t.select();try{document.execCommand('copy');}catch(e){}document.body.removeChild(t);done();}
+}
+function card(opts,i){
+  var a=el(opts.href?'a':'div','','card');
+  if(opts.href){a.href=opts.href;a.target='_blank';a.rel='noopener noreferrer';}
+  if(opts.onclick)a.addEventListener('click',opts.onclick);
+  a.style.animationDelay=(i*0.07)+'s';
+  var ic=el('div','','ic');
+  if(opts.img){var im=document.createElement('img');im.src=opts.img;im.alt='';im.onerror=function(){ic.textContent=opts.icon||'•';};ic.appendChild(im);}
+  else ic.textContent=opts.icon||'•';
+  ic.style.background=opts.grad||'linear-gradient(135deg,#6ea8ff,#a46bff)';
+  var tx=el('div','','txt');
+  var ap=el('div','','app');ap.appendChild(el('span',opts.app));ap.appendChild(el('span',T[lang].now));
+  tx.appendChild(ap);tx.appendChild(el('div',opts.title,'ttl'));
+  if(opts.sub)tx.appendChild(el('div',opts.sub,'sub'));
+  a.appendChild(ic);a.appendChild(tx);
+  if(opts.copy){
+    var b=el('button',T[lang].copy,'cp');
+    b.addEventListener('click',function(e){e.preventDefault();e.stopPropagation();copyText(opts.copy,b);});
+    a.appendChild(b);
+  }
+  return a;
+}
+function render(){
+  var L=T[lang];
+  document.documentElement.lang=lang;
+  document.documentElement.dir=lang==='ar'?'rtl':'ltr';
+  document.documentElement.classList.toggle('light',light);
+  var name=lang==='ar'?cfg.name_ar:cfg.name_en;
+  document.title=name||'Ahmed';
+  document.getElementById('nm').textContent=name||'';
+  document.getElementById('bio').textContent=(lang==='ar'?cfg.bio_ar:cfg.bio_en)||'';
+  document.getElementById('av').textContent=(name||'A').trim().charAt(0);
+  document.getElementById('lang').textContent=L.lang;
+  document.getElementById('theme').textContent=light?L.dark:L.light;
+  document.getElementById('foot').textContent=L.foot;
+  var list=document.getElementById('list');list.replaceChildren();
+  var i=0;
+  (cfg.links||[]).forEach(function(k){
+    list.appendChild(card({
+      href:k.url,icon:k.icon,grad:'linear-gradient(135deg,'+k.c1+','+k.c2+')',
+      app:lang==='ar'?k.app_ar:k.app_en,
+      title:lang==='ar'?k.title_ar:k.title_en,sub:k.handle
+    },i++));
+  });
+  if(cfg.sham&&cfg.sham.code){
+    list.appendChild(card({
+      img:'logo.png',icon:'💳',grad:'linear-gradient(135deg,#1fa971,#0d7a4f)',
+      app:L.sham,title:L.shamT,sub:cfg.sham.code,copy:cfg.sham.code
+    },i++));
+  }
+  list.appendChild(card({
+    href:'game.html',icon:'🌙',grad:'linear-gradient(135deg,#3b3f9e,#7b4fd1)',
+    app:L.calm,title:L.calmT
+  },i++));
+}
+document.getElementById('lang').addEventListener('click',function(){
+  lang=lang==='ar'?'en':'ar';try{localStorage.setItem('lang',lang);}catch(e){}render();
+});
+document.getElementById('theme').addEventListener('click',function(){
+  light=!light;try{localStorage.setItem('theme',light?'light':'dark');}catch(e){}render();
+});
+render();
+})();
+</script></body></html>
