@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>حزر الدولة</title>
+<style>
+body{margin:0;min-height:100vh;background:#0b0e14;color:#f2f4f8;font-family:system-ui,sans-serif;padding:20px 14px}
+.w{max-width:460px;margin:0 auto;text-align:center}
+h1{font-size:22px}
+.box{background:rgba(255,255,255,.07);border-radius:18px;padding:16px;margin-top:14px}
+.flag{font-size:90px;line-height:1.1;margin:10px 0}
+.q{font-size:20px;margin:8px 0}
+.timer{font-size:28px;font-weight:700;color:#ffb86b}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+button{font-size:16px;padding:12px;border-radius:12px;border:1px solid #33415c;background:#141a26;color:#fff;cursor:pointer}
+button:disabled{opacity:.7;cursor:default}
+.good{background:#1e5b34 !important;border-color:#2ea043 !important}
+.bad{background:#5b1e1e !important;border-color:#f85149 !important}
+.start{background:#2f81f7;border:0;width:100%;font-size:18px;padding:14px;margin-top:10px}
+.score{margin-top:10px;color:#9aa4b5}
+a{color:#6ea8ff}
+</style></head><body><div class="w">
+<h1>🌍 حزر الدولة</h1>
+<div class="box" id="intro">
+  <p>سؤال من 4 خيارات، عندك 5 ثوانٍ لكل سؤال.</p>
+  <button class="start" onclick="startGame()">ابدأ</button>
+</div>
+<div class="box" id="game" style="display:none">
+  <div class="timer" id="timer">5</div>
+  <div class="flag" id="flag"></div>
+  <div class="q" id="q"></div>
+  <div class="opts" id="opts"></div>
+  <div class="score" id="score"></div>
+  <button class="start" id="next" onclick="nextQ()" style="display:none">التالي</button>
+</div>
+<p><a href="games.html">← قائمة الألعاب</a></p>
+</div>
+<script>
+var C=[
+{n:'اليابان',f:'🇯🇵',c:'طوكيو'},{n:'كندا',f:'🇨🇦',c:'أوتاوا'},{n:'المملكة المتحدة',f:'🇬🇧',c:'لندن'},
+{n:'فرنسا',f:'🇫🇷',c:'باريس'},{n:'ألمانيا',f:'🇩🇪',c:'برلين'},{n:'إيطاليا',f:'🇮🇹',c:'روما'},
+{n:'الصين',f:'🇨🇳',c:'بكين'},{n:'الهند',f:'🇮🇳',c:'نيودلهي'},{n:'البرازيل',f:'🇧🇷',c:'برازيليا'},
+{n:'كوريا الجنوبية',f:'🇰🇷',c:'سيول'},{n:'الولايات المتحدة',f:'🇺🇸',c:'واشنطن'},
+{n:'المملكة العربية السعودية',f:'🇸🇦',c:'الرياض'},{n:'تركيا',f:'🇹🇷',c:'أنقرة'},
+{n:'سويسرا',f:'🇨🇭',c:'برن'},{n:'الأرجنتين',f:'🇦🇷',c:'بوينس آيرس'},{n:'المكسيك',f:'🇲🇽',c:'مكسيكو سيتي'},
+{n:'مصر',f:'🇪🇬',c:'القاهرة'},{n:'جنوب أفريقيا',f:'🇿🇦',c:'بريتوريا'},{n:'أستراليا',f:'🇦🇺',c:'كانبرا'},
+{n:'نيوزيلندا',f:'🇳🇿',c:'ويلينغتون'},{n:'اليونان',f:'🇬🇷',c:'أثينا'},{n:'إسبانيا',f:'🇪🇸',c:'مدريد'},
+{n:'البرتغال',f:'🇵🇹',c:'لشبونة'},{n:'هولندا',f:'🇳🇱',c:'أمستردام'},{n:'بلجيكا',f:'🇧🇪',c:'بروكسل'},
+{n:'النرويج',f:'🇳🇴',c:'أوسلو'},{n:'السويد',f:'🇸🇪',c:'ستوكهولم'},{n:'الدنمارك',f:'🇩🇰',c:'كوبنهاغن'},
+{n:'فنلندا',f:'🇫🇮',c:'هلسنكي'},{n:'روسيا',f:'🇷🇺',c:'موسكو'},{n:'بولندا',f:'🇵🇱',c:'وارسو'},
+{n:'أوكرانيا',f:'🇺🇦',c:'كييف'},{n:'رومانيا',f:'🇷🇴',c:'بوخارست'},{n:'المجر',f:'🇭🇺',c:'بودابست'},
+{n:'التشيك',f:'🇨🇿',c:'براغ'},{n:'النمسا',f:'🇦🇹',c:'فيينا'},{n:'أيرلندا',f:'🇮🇪',c:'دبلن'},
+{n:'إيران',f:'🇮🇷',c:'طهران'},{n:'العراق',f:'🇮🇶',c:'بغداد'},{n:'سوريا',f:'🇸🇾',c:'دمشق'},
+{n:'لبنان',f:'🇱🇧',c:'بيروت'},{n:'الأردن',f:'🇯🇴',c:'عمّان'},{n:'المغرب',f:'🇲🇦',c:'الرباط'},
+{n:'الجزائر',f:'🇩🇿',c:'الجزائر العاصمة'},{n:'تونس',f:'🇹🇳',c:'تونس'},{n:'ليبيا',f:'🇱🇾',c:'طرابلس'},
+{n:'السودان',f:'🇸🇩',c:'الخرطوم'},{n:'إثيوبيا',f:'🇪🇹',c:'أديس أبابا'},{n:'كينيا',f:'🇰🇪',c:'نيروبي'},
+{n:'نيجيريا',f:'🇳🇬',c:'أبوجا'},{n:'غانا',f:'🇬🇭',c:'أكرا'},{n:'السنغال',f:'🇸🇳',c:'داكار'},
+{n:'تنزانيا',f:'🇹🇿',c:'دودوما'},{n:'أوغندا',f:'🇺🇬',c:'كامبالا'},{n:'رواندا',f:'🇷🇼',c:'كيغالي'},
+{n:'ناميبيا',f:'🇳🇦',c:'windhoek'},{n:'موريشيوس',f:'🇲🇺',c:'بورت لويس'},{n:'مدغشقر',f:'🇲🇬',c:'أنتاناناريفو'},
+{n:'موزمبيق',f:'🇲🇿',c:'مابوتو'},{n:'أنغولا',f:'🇦🇴',c:'لواندا'},{n:'بوتسوانا',f:'🇧🇼',c:'غابورون'},
+{n:'زيمبابوي',f:'🇿🇼',c:'هراري'},{n:'بيرو',f:'🇵🇪',c:'ليما'},{n:'تشيلي',f:'🇨🇱',c:'سانتياغو'},
+{n:'كولومبيا',f:'🇨🇴',c:'بوغوتا'},{n:'بوليفيا',f:'🇧🇴',c:'لاباز'},{n:'باراغواي',f:'🇵🇾',c:'أسونسيون'},
+{n:'الإكوادور',f:'🇪🇨',c:'كيتو'},{n:'فنزويلا',f:'🇻🇪',c:'كاراكاس'},{n:'بنما',f:'🇵🇦',c:'بنما'}
+];
+var order=[],idx=0,score=0,tm=null,t=5,answered=false;
+function shuffle(a){for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var x=a[i];a[i]=a[j];a[j]=x;}return a;}
+function startGame(){
+  document.getElementById('intro').style.display='none';
+  document.getElementById('game').style.display='block';
+  order=shuffle(C.map(function(_,i){return i;}));idx=0;score=0;
+  show();
+}
+function pickOptions(correct){
+  var others=C.filter(function(x){return x.n!==correct.n;});
+  shuffle(others);
+  return shuffle([correct].concat(others.slice(0,3)));
+}
+function show(){
+  answered=false;
+  var c=C[order[idx]];
+  var asFlag=idx%2===0;
+  document.getElementById('flag').textContent=asFlag?c.f:'';
+  document.getElementById('q').textContent=asFlag?'ما اسم هذه الدولة؟':'عاصمة هذه الدولة: '+c.n+'؟';
+  var opts=pickOptions(asFlag?c:c);
+  var box=document.getElementById('opts');box.innerHTML='';
+  opts.forEach(function(o){
+    var b=document.createElement('button');
+    b.textContent=asFlag?o.n:o.c;
+    b.onclick=function(){choose(o,b);};
+    box.appendChild(b);
+  });
+  document.getElementById('score').textContent='النقاط: '+score+' / '+(idx);
+  document.getElementById('next').style.display='none';
+  startTimer();
+}
+function startTimer(){
+  clearInterval(tm);t=5;document.getElementById('timer').textContent=t;
+  tm=setInterval(function(){
+    t--;document.getElementById('timer').textContent=t;
+    if(t<=0){clearInterval(tm);if(!answered)reveal(null);}
+  },1000);
+}
+function choose(o,btn){
+  if(answered)return;
+  answered=true;clearInterval(tm);
+  var c=C[order[idx]];
+  var correct=(idx%2===0)?(o.n===c.n):(o.c===c.c);
+  if(correct)score++;
+  reveal(correct?btn:null);
+}
+function reveal(btn){
+  answered=true;clearInterval(tm);
+  var c=C[order[idx]];
+  var asFlag=idx%2===0;
+  var buttons=document.querySelectorAll('#opts button');
+  buttons.forEach(function(b){
+    var text=b.textContent;
+    var isRight=asFlag?(text===c.n):(text===c.c);
+    b.disabled=true;
+    if(isRight)b.className='good';
+    else if(btn===b)b.className='bad';
+  });
+  document.getElementById('score').textContent='الجواب الصحيح: '+(asFlag?c.n:c.c)+' | النقاط: '+score+' / '+(idx+1);
+  var nx=document.getElementById('next');
+  nx.style.display='block';
+  nx.textContent=idx<C.length-1?'التالي':'انتهت اللعبة';
+  nx.disabled=idx>=C.length-1;
+}
+function nextQ(){
+  idx++;
+  if(idx>=order.length){document.getElementById('q').textContent='انتهت اللعبة! نتيجتك: '+score+' من '+order.length;document.getElementById('opts').innerHTML='';document.getElementById('flag').textContent='🏆';document.getElementById('next').style.display='none';clearInterval(tm);document.getElementById('timer').textContent='';return;}
+  show();
+}
+</script></body></html>
