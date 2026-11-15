@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>تخمين الكلمة</title>
+<style>
+body{margin:0;min-height:100vh;background:#0b0e14;color:#f2f4f8;font-family:system-ui,sans-serif;padding:20px 14px}
+.w{max-width:460px;margin:0 auto;text-align:center}
+h1{font-size:22px}
+input,button{font-size:17px;padding:12px;border-radius:12px;border:1px solid #33415c;background:#141a26;color:#fff;width:100%;box-sizing:border-box;margin-top:8px}
+button{background:#2f81f7;border:0;cursor:pointer}
+.box{background:rgba(255,255,255,.07);border-radius:18px;padding:16px;margin-top:14px;text-align:right}
+.big{font-size:30px;letter-spacing:6px;margin:14px 0}
+.ok{color:#7ee787}.no{color:#ff7b72}
+a{color:#6ea8ff}
+</style></head><body><div class="w">
+<h1>🔤 تخمين الكلمة</h1>
+<p>لاعب يختار كلمة ويعطي تلميحات، والبقية يخمنون. عدد المحاولات 6.</p>
+<div id="s1" class="box">
+  <p>الشخص الذي يختار الكلمة: اكتب الكلمة، ثم أعطِ الجميع الهاتف.</p>
+  <input id="w" placeholder="الكلمة السرية">
+  <button onclick="start()">ابدأ</button>
+</div>
+<div id="s2" class="box" style="display:none">
+  <p>الكلمة من <b id="len"></b> حروف</p>
+  <div class="big" id="mask"></div>
+  <input id="g" placeholder="اكتب تخمينك">
+  <button onclick="guess()">تخمين</button>
+  <p>المحاولات المتبقية: <b id="left"></b></p>
+  <p id="msg"></p>
+</div>
+<p><a href="games.html">← قائمة الألعاب</a></p>
+</div>
+<script>
+var W='',left=6;
+function norm(s){return s.trim().toLowerCase();}
+function start(){
+  W=norm(document.getElementById('w').value);
+  if(W.length<2){alert('اكتب كلمة من حرفين على الأقل');return;}
+  document.getElementById('w').value='';
+  document.getElementById('s1').style.display='none';
+  document.getElementById('s2').style.display='block';
+  document.getElementById('len').textContent=W.length;
+  document.getElementById('mask').textContent=Array(W.length+1).join('_ ');
+  document.getElementById('left').textContent=left;
+}
+function guess(){
+  var g=norm(document.getElementById('g').value);
+  document.getElementById('g').value='';
+  if(!g)return;
+  var m=document.getElementById('msg');
+  if(g===W){m.className='ok';m.textContent='🎉 صحيح! الكلمة: '+W;document.getElementById('mask').textContent=W.split('').join(' ');return;}
+  left--;
+  var show='';
+  for(var i=0;i<W.length;i++){show+=(g[i]===W[i])?W[i]+' ':'_ ';}
+  document.getElementById('mask').textContent=show.trim();
+  document.getElementById('left').textContent=left;
+  m.className='no';
+  m.textContent=left>0?'خطأ، جرّب مرة ثانية':'انتهت المحاولات. الكلمة: '+W;
+}
+</script></body></html>

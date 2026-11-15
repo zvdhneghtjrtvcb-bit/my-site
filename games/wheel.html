@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>عجلة الحظ</title>
+<style>
+body{margin:0;min-height:100vh;background:#0b0e14;color:#f2f4f8;font-family:system-ui,sans-serif;padding:20px 14px}
+.w{max-width:460px;margin:0 auto;text-align:center}
+h1{font-size:22px}
+textarea,input,button{font-size:16px;padding:12px;border-radius:12px;border:1px solid #33415c;background:#141a26;color:#fff;width:100%;box-sizing:border-box;margin-top:8px}
+button{background:#2f81f7;border:0;cursor:pointer}
+.box{background:rgba(255,255,255,.07);border-radius:18px;padding:16px;margin-top:14px}
+.res{font-size:22px;margin:14px 0;min-height:60px}
+.warn{font-size:13px;color:#d29922;margin-top:10px}
+a{color:#6ea8ff}
+</style></head><body><div class="w">
+<h1>🎡 عجلة الحظ</h1>
+<div class="box" id="setup">
+  <p>أدخل أسماء اللاعبين (اسم في كل سطر)، وأسئلة أو تحديات (سطر لكل واحد):</p>
+  <textarea id="names" rows="4" placeholder="أحمد&#10;سارة&#10;علي"></textarea>
+  <textarea id="items" rows="5" placeholder="اسرد ثلاث نقاط عن نفسك&#10;قلّد حيواناً&#10;ما أغرب طعام أكلته؟"></textarea>
+  <button onclick="begin()">ابدأ</button>
+</div>
+<div class="box" id="game" style="display:none">
+  <div class="res" id="r1"></div>
+  <div class="res" id="r2"></div>
+  <div class="res" id="r3"></div>
+  <button id="spin" onclick="spin()">🎡 دوّر العجلة</button>
+  <p class="warn">العقاب (إن رفض التحدي أو لم يجب): ضربة خفيفة باليد على اليد فقط، بعدد يحدده الرقم. يتفق الجميع على ذلك قبل اللعب.</p>
+</div>
+<p><a href="games.html">← قائمة الألعاب</a></p>
+</div>
+<script>
+var N=[],I=[],step=0;
+function lines(id){return document.getElementById(id).value.split('\n').map(function(x){return x.trim();}).filter(Boolean);}
+function begin(){
+  N=lines('names');I=lines('items');
+  if(!N.length||!I.length){alert('أدخل لاعبين وتحديات على الأقل');return;}
+  document.getElementById('setup').style.display='none';
+  document.getElementById('game').style.display='block';
+  step=0;
+}
+function pick(a){return a[Math.floor(Math.random()*a.length)];}
+function spin(){
+  var r1=document.getElementById('r1'),r2=document.getElementById('r2'),r3=document.getElementById('r3');
+  if(step===0){
+    r1.textContent='👤 الدور على: '+pick(N);
+    r2.textContent='';r3.textContent='';
+    step=1;
+    document.getElementById('spin').textContent='🎡 دوّر للتحدي أو السؤال';
+  }else if(step===1){
+    var kind=Math.random()<.5?'🎯 تحدٍّ: ':'❓ سؤال: ';
+    r2.textContent=kind+pick(I);
+    var n=1+Math.floor(Math.random()*4);
+    r3.textContent='إن لم يُنفّذ/لم يُجب: '+n+' ضربة خفيفة على اليد';
+    step=0;
+    document.getElementById('spin').textContent='🎡 دوّر للاعب التالي';
+  }
+}
+</script></body></html>

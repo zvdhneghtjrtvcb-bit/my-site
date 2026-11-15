@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ثلاثة على هاتف واحد</title>
+<style>
+body{margin:0;min-height:100vh;background:#0b0e14;color:#f2f4f8;font-family:system-ui,sans-serif;padding:20px 14px}
+.w{max-width:460px;margin:0 auto;text-align:center}
+h1{font-size:22px}
+input,button{font-size:17px;padding:12px;border-radius:12px;border:1px solid #33415c;background:#141a26;color:#fff;width:100%;box-sizing:border-box;margin-top:8px}
+button{background:#2f81f7;border:0;cursor:pointer}
+.box{background:rgba(255,255,255,.07);border-radius:18px;padding:16px;margin-top:14px}
+.big{font-size:26px;margin:12px 0}
+a{color:#6ea8ff}
+</style></head><body><div class="w">
+<h1>👥 ثلاثة على هاتف واحد</h1>
+<p>كل لاعب يجيب سؤالاً، ويتبادل الهاتف. من يجيب صح يأخذ نقطة.</p>
+<div class="box" id="setup">
+  <input id="p1" placeholder="اسم اللاعب الأول">
+  <input id="p2" placeholder="اسم اللاعب الثاني">
+  <input id="p3" placeholder="اسم اللاعب الثالث">
+  <button onclick="begin()">ابدأ</button>
+</div>
+<div class="box" id="game" style="display:none">
+  <p>الدور على: <b class="big" id="turn"></b></p>
+  <p id="q"></p>
+  <button onclick="correct()">✅ إجابة صحيحة (+1)</button>
+  <button onclick="nextTurn()" style="background:#6e7681">⏭ التالي</button>
+  <p id="score"></p>
+</div>
+<p><a href="games.html">← قائمة الألعاب</a></p>
+</div>
+<script>
+var P=[],S=[0,0,0],T=0,Q=[
+ 'ما أكثر فاكهة فيها بذور خارجية؟',
+ 'ما الشيء الذي كلما أخذت منه كبر؟',
+ 'ما عاصمة اليابان؟',
+ 'كم ضلعاً للمثلث؟',
+ 'ما الحيوان الذي يُلقّب سفينة الصحراء؟',
+ 'ما اسم أطول نهر في العالم؟',
+ 'ما الشيء الذي له أسنان ولا يعض؟',
+ 'كم لوناً في قوس قزح؟'
+];
+var used=[];
+function begin(){
+  P=[1,2,3].map(function(i){return document.getElementById('p'+i).value.trim()||('لاعب '+i);});
+  document.getElementById('setup').style.display='none';
+  document.getElementById('game').style.display='block';
+  show();
+}
+function show(){
+  document.getElementById('turn').textContent=P[T];
+  var pool=Q.filter(function(_,i){return used.indexOf(i)<0;});
+  if(!pool.length){used=[];pool=Q;}
+  var i=Q.indexOf(pool[Math.floor(Math.random()*pool.length)]);used.push(i);
+  document.getElementById('q').textContent=Q[i];
+  document.getElementById('score').textContent=P.map(function(n,k){return n+': '+S[k];}).join(' | ');
+}
+function correct(){S[T]++;nextTurn();}
+function nextTurn(){T=(T+1)%3;show();}
+</script></body></html>
